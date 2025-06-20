@@ -1,6 +1,6 @@
 # myTaskApp 개발 가이드
 
-이 문서는 FreeRTOS POSIX 시뮬레이터 환경에서 myTaskApp을 개발 및 빌드하는 방법을 안내합니다.
+FreeRTOS POSIX 시뮬레이터 환경에서 myTaskApp을 개발 및 빌드하는 방법을 안내합니다.
 
 ---
 
@@ -9,16 +9,19 @@
 FreeRTOS 공식 커널 소스는 [GitHub FreeRTOS-Kernel](https://github.com/FreeRTOS/FreeRTOS-Kernel)에서 받을 수 있습니다.
 
 ### (1) git clone 이용
+
 ```sh
 git clone https://github.com/FreeRTOS/FreeRTOS-Kernel.git
 mv FreeRTOS-Kernel src/FreeRTOS-Kernel-src
 ```
 
 ### (2) ZIP 파일 다운로드
+
 - [FreeRTOS-Kernel-src.zip](https://github.com/FreeRTOS/FreeRTOS-Kernel/archive/refs/heads/main.zip) 파일을 다운로드 후 압축 해제
 - 압축 해제한 폴더를 `src/FreeRTOS-Kernel-src`으로 이동/이름 변경
 
 > **중요:**
+>
 > - POSIX 포팅(`portable/ThirdParty/GCC/Posix`)과 메모리 관리(`portable/MemMang/heap_4.c`) 파일이 포함되어 있는지 확인하세요.
 
 ---
@@ -106,11 +109,8 @@ make
 ---
 
 ## 5. 참고 사항
+
 - FreeRTOS POSIX 포팅은 macOS, Linux 등에서 테스트 가능합니다.
 - 추가 태스크/기능 구현 시 `src/main.c`를 수정하세요.
 - 커널 소스 업데이트 시 `src/FreeRTOS-Kernel-src`을 교체하면 됩니다.
 - 빌드 실패 시, Makefile의 소스 경로와 파일 목록을 점검하세요.
-
----
-
-문의 및 개선 사항은 언제든 코드에 코멘트로 남겨주세요.
