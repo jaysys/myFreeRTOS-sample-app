@@ -1,6 +1,7 @@
 # myTaskApp 개발 가이드
 
 FreeRTOS POSIX 시뮬레이터 환경에서 myTaskApp을 개발 및 빌드하는 방법을 안내합니다.
+Macbook M3 Chip 기반의 macOS 환경에서 빌드하고 검증했습니다.
 
 ---
 
