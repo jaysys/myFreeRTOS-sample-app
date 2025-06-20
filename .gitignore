@@ -1,0 +1,17 @@
+# Ignore build artifacts
+build/
+*.o
+*.obj
+*.exe
+*.out
+*.log
+# Editor files
+*.swp
+*.swo
+*~
+.DS_Store
+# OS generated files
+Thumbs.db
+
+# Ignore FreeRTOS Kernel directory
+src/FreeRTOS-Kernel-src/
