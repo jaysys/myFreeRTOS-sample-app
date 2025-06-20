@@ -12,6 +12,13 @@
 #define mainTASK_YE_PRIORITY    ( tskIDLE_PRIORITY + 2 )
 
 /* Queues used by the tasks */
+#include <time.h>
+
+typedef struct {
+    char json[128]; // JSON 문자열을 저장할 버퍼
+    long timestamp; // UNIX epoch seconds
+} Message_t;
+
 static QueueHandle_t xYaToYeQueue = NULL;
 static QueueHandle_t xYeToYaQueue = NULL;
 
@@ -26,8 +33,8 @@ int main( void )
     printf("Starting myTaskApp FreeRTOS Demo\n");
 
     /* Create the queues used by TaskYa and TaskYe. */
-    xYaToYeQueue = xQueueCreate( 1, sizeof( char * ) );
-    xYeToYaQueue = xQueueCreate( 1, sizeof( char * ) );
+    xYaToYeQueue = xQueueCreate( 1, sizeof( Message_t ) );
+    xYeToYaQueue = xQueueCreate( 1, sizeof( Message_t ) );
 
     if( ( xYaToYeQueue != NULL ) && ( xYeToYaQueue != NULL ) )
     {
@@ -50,20 +57,25 @@ int main( void )
 static void prvTaskYa( void *pvParameters )
 {
     ( void ) pvParameters;
-    const char *pcMessageToSend = "Ping from Ya";
-    char *pcReceivedMessage;
+    Message_t msgToSend;
+    Message_t msgReceived;
 
     for( ;; )
     {
+        // 타임스탬프 저장
+        msgToSend.timestamp = time(NULL);
+        // JSON 메시지 작성 (timestamp 포함)
+        snprintf(msgToSend.json, sizeof(msgToSend.json), "{\"from\":\"Ya\",\"msg\":\"Ping\",\"timestamp\":%ld}", msgToSend.timestamp);
+
         printf("TaskYa: Sending ping...\n");
-        xQueueSend( xYaToYeQueue, &pcMessageToSend, portMAX_DELAY );
+        xQueueSend( xYaToYeQueue, &msgToSend, portMAX_DELAY );
 
-        if( xQueueReceive( xYeToYaQueue, &pcReceivedMessage, portMAX_DELAY ) == pdPASS )
+        // 응답 대기
+        if( xQueueReceive( xYeToYaQueue, &msgReceived, portMAX_DELAY ) == pdPASS )
         {
-            printf("TaskYa: Received response: \"%s\"\n", pcReceivedMessage);
+            printf("TaskYa: Received response: %s\n", msgReceived.json);
         }
-
-        vTaskDelay( pdMS_TO_TICKS( 2000 ) );
+        vTaskDelay( pdMS_TO_TICKS( 1000 ) );
     }
 }
 
@@ -72,16 +84,23 @@ static void prvTaskYa( void *pvParameters )
 static void prvTaskYe( void *pvParameters )
 {
     ( void ) pvParameters;
-    char *pcReceivedMessage;
-    const char *pcMessageToSend = "Pong from Ye";
+    Message_t msgToSend;
+    Message_t msgReceived;
 
     for( ;; )
     {
-        if( xQueueReceive( xYaToYeQueue, &pcReceivedMessage, portMAX_DELAY ) == pdPASS )
+        // 메시지 대기
+        if( xQueueReceive( xYaToYeQueue, &msgReceived, portMAX_DELAY ) == pdPASS )
         {
-            printf("TaskYe: Received message: \"%s\"\n", pcReceivedMessage);
+            printf("TaskYe: Received message: %s\n", msgReceived.json);
+
+            // 타임스탬프 저장
+            msgToSend.timestamp = time(NULL);
+            // JSON 메시지 작성 (timestamp 포함)
+            snprintf(msgToSend.json, sizeof(msgToSend.json), "{\"from\":\"Ye\",\"msg\":\"Pong\",\"timestamp\":%ld}", msgToSend.timestamp);
+
             printf("TaskYe: Sending pong...\n");
-            xQueueSend( xYeToYaQueue, &pcMessageToSend, portMAX_DELAY );
+            xQueueSend( xYeToYaQueue, &msgToSend, portMAX_DELAY );
         }
     }
 }
